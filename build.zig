@@ -203,7 +203,7 @@ pub fn build(builder: *std.Build) void {
     example.addDirectoryArg(.{ .relative = .{ .base = .install_include } });
     example.addArg("--library");
     example.addFileArg(.{ .relative = .{ .base = .install_lib, .sub_path = "libnilu.a" } });
-    for ([_][]const u8{ "test/install/stack.c", "examples/hello.c", "examples/host_function.c", "examples/coroutine.c" }) |source| {
+    for ([_][]const u8{ "test/install/stack.c", "examples/hello.c", "examples/host_function.c", "examples/coroutine.c", "examples/rules.c" }) |source| {
         example.addArg("--source");
         example.addFileArg(builder.path(source));
     }

@@ -1,0 +1,9 @@
+limit 500, review from 100
+sale         40 -> allow (event 1)
+sale        250 -> review (event 2 is large)
+refund      900 -> deny (refund over 500)
+note          1 -> failed: rules:10: attempt to index a number value (local 'amount')
+audit         0 -> stopped: the rule ran past its budget
+refund       30 -> allow (event 6)
+10000 more sales: 6700 allowed
+after nilu_close, 0 bytes still held
