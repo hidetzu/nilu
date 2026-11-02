@@ -37,13 +37,15 @@ const fixture = run => {
       writeFileSync(join(directory, 'src/root.zig'), text);
     };
     const build = (...steps) => {
-      // The global cache is set through the environment: `zig build` takes no
-      // option for it.
+      // The project's global cache is the caller's, which the outer build has
+      // already filled with the standard library: a cache of its own started
+      // empty on every fresh machine, and a CI runner compiled it all again in
+      // each case. The cache is content-addressed, so sharing it changes no
+      // result. The timeout only stops a hang; a slow runner needs minutes.
       const result = spawnSync(zig, ['build', ...steps, '--summary', 'all'], {
         cwd: directory,
-        env: { ...process.env, ZIG_GLOBAL_CACHE_DIR: join(tmpdir(), 'nilu-build-check-global') },
         encoding: 'utf8',
-        timeout: 120000,
+        timeout: 600000,
         maxBuffer: 4 * 1024 * 1024,
       });
       if (result.error) throw result.error;
