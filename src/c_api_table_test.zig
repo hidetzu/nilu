@@ -438,3 +438,63 @@ test "c_api_remaining userdata finalizers remain raw and refusal is atomic" {
     try equal(api.Status.ok, api.nilu_setmetatable(&state, 1));
     try expect(state.get(1).?.unpack().userdata.metatable == null);
 }
+
+// nilu_getfield and nilu_setfield are gettable and settable with a string
+// key: the same metamethods run, and a negative index names the table as it
+// stood before the call pushed anything.
+test "c_api_table getfield and setfield read and write a string key as gettable and settable do" {
+    const state = try api.create(a);
+    defer api.nilu_close(state);
+    try equal(api.Status.ok, api.nilu_openlibs(state));
+    try equal(api.Status.ok, api.nilu_loadnamed(state,
+        \\local log = {}
+        \\local base = { inherited = "from __index" }
+        \\local t = setmetatable({ own = 1 }, {
+        \\  __index = base,
+        \\  __newindex = function(t, k, v) log[#log + 1] = k .. "=" .. tostring(v); rawset(t, k, v) end,
+        \\})
+        \\return t, function() return table.concat(log, ",") end
+    , "=fields", null));
+    try equal(api.Status.ok, api.nilu_call(state, 0, 2));
+    // [t, log]; -2 names t.
+    try equal(api.Status.ok, api.nilu_getfield(state, -2, "own"));
+    try equal(@as(c_longlong, 1), api.nilu_tointegerx(state, -1, null));
+    _ = api.nilu_settop(state, -1 - 1);
+    try equal(api.Status.ok, api.nilu_getfield(state, -2, "inherited"));
+    try std.testing.expectEqualStrings("from __index", std.mem.span(api.nilu_tolstring(state, -1, null).?));
+    _ = api.nilu_settop(state, -1 - 1);
+    try equal(api.Status.ok, api.nilu_getfield(state, -2, "absent"));
+    try equal(@backingInt(api.Type.nil), api.nilu_type(state, -1));
+    _ = api.nilu_settop(state, -1 - 1);
+    // A new key goes through __newindex; an existing one is stored directly.
+    try equal(api.Status.ok, api.nilu_pushinteger(state, 7));
+    try equal(api.Status.ok, api.nilu_setfield(state, -3, "added"));
+    try equal(api.Status.ok, api.nilu_pushinteger(state, 2));
+    try equal(api.Status.ok, api.nilu_setfield(state, -3, "own"));
+    try equal(@as(c_int, 2), api.nilu_gettop(state));
+    try equal(api.Status.ok, api.nilu_getfield(state, 1, "added"));
+    try equal(@as(c_longlong, 7), api.nilu_tointegerx(state, -1, null));
+    try equal(api.Status.ok, api.nilu_getfield(state, 1, "own"));
+    try equal(@as(c_longlong, 2), api.nilu_tointegerx(state, -1, null));
+    _ = api.nilu_settop(state, -2 - 1);
+    try equal(api.Status.ok, api.nilu_call(state, 0, 1));
+    try std.testing.expectEqualStrings("added=7", std.mem.span(api.nilu_tolstring(state, -1, null).?));
+}
+
+// A direct refusal preserves its inputs and adds nothing (the header): getfield
+// had no input on the stack but the table, and setfield keeps its value.
+test "c_api_table getfield and setfield on a value that is not a table fail as gettable does" {
+    const state = try api.create(a);
+    defer api.nilu_close(state);
+    try equal(api.Status.ok, api.nilu_pushinteger(state, 5));
+    try equal(api.Status.type, api.nilu_getfield(state, 1, "x"));
+    try equal(@as(c_int, 1), api.nilu_gettop(state));
+    try key(state, "x");
+    try equal(api.Status.type, api.nilu_gettable(state, 1));
+    try equal(@as(c_int, 2), api.nilu_gettop(state));
+    _ = api.nilu_settop(state, 1);
+    try equal(api.Status.ok, api.nilu_pushinteger(state, 6));
+    try equal(api.Status.type, api.nilu_setfield(state, 1, "x"));
+    try equal(@as(c_int, 2), api.nilu_gettop(state));
+    try equal(@as(c_longlong, 6), api.nilu_tointegerx(state, 2, null));
+}

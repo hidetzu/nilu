@@ -53,13 +53,12 @@ static int budget_hook(NiluState *N) {
   return --budget_left <= 0;
 }
 
-/* config.<name> as an integer, or `fallback` when it is absent. A field read
- * is two calls: the header has no nilu_getfield. */
+/* config.<name> as an integer, or `fallback` when it is absent. */
 static long long config_integer(NiluState *N, const char *name, long long fallback) {
   int top = nilu_gettop(N);
   long long value = fallback;
   if (nilu_getglobal(N, "config") == NILU_OK && nilu_type(N, -1) == NILU_TTABLE &&
-      nilu_pushstring(N, name) == NILU_OK && nilu_gettable(N, -2) == NILU_OK) {
+      nilu_getfield(N, -1, name) == NILU_OK) {
     int isnum = 0;
     long long read = nilu_tointegerx(N, -1, &isnum);
     if (isnum) value = read;
