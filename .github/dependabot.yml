@@ -1,0 +1,12 @@
+# The repository's only dependencies are the actions its workflow uses: the
+# build needs nothing but Zig's standard library, and the tools run on Node
+# alone. Dependabot proposes their updates as pull requests, which pass the
+# same `checks` as any other change.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci
