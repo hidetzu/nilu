@@ -78,7 +78,7 @@ through the stack API. Each state owns its values and is released with
 The [embedding guide](doc/en/12-embedding.md) describes the interface: loading
 scripts, calling functions and passing host data. A host links `zig-out/lib/libnilu.a`
 and includes `zig-out/include/nilu.h`. [`examples/`](examples/) holds small whole hosts —
-the shortest one, functions in both directions, and a coroutine the host drives — and
+the shortest one, functions in both directions, a coroutine the host drives, and a host that runs rules a script defines under its own allocator and an instruction budget — and
 `zig build example` builds each against the installed files and compares what it prints.
 
 Loaded function bodies stay allocated until their state closes. Hosts that reload
