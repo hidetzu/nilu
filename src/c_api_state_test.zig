@@ -57,6 +57,53 @@ test "host_allocator the host's refusal is a memory failure, or no state at all"
     try std.testing.expectEqual(@as(isize, 0), ledger.blocks);
 }
 
+/// Refuses only the request numbered `refuse`, counting every request that
+/// asks for memory, so each refusal is followed by requests that succeed.
+const Refusal = struct { requests: usize = 0, refuse: usize = 0, ledger: Ledger = .{} };
+
+fn refusingAlloc(ud: ?*anyopaque, ptr: ?*anyopaque, osize: usize, nsize: usize) callconv(.c) ?*anyopaque {
+    const refusal: *Refusal = @ptrCast(@alignCast(ud.?));
+    if (nsize != 0) {
+        refusal.requests += 1;
+        if (refusal.requests == refusal.refuse) return null;
+    }
+    return hostAlloc(&refusal.ledger, ptr, osize, nsize);
+}
+
+// A host's allocator may refuse one request and grant the next. The
+// every-failure check over the testing allocator cannot show what follows
+// that: once it refuses, it refuses every later request too, so a caller that
+// ignored a refused status fails at its next allocation instead of going on
+// with a stack one value short.
+test "host_allocator a single refusal anywhere in opening the libraries and a call is a memory failure" {
+    var probe = Refusal{};
+    const whole = api.nilu_newstate(refusingAlloc, &probe) orelse return error.TestUnexpectedResult;
+    try std.testing.expectEqual(api.Status.ok, api.nilu_openlibs(whole));
+    try std.testing.expectEqual(api.Status.ok, api.nilu_loadnamed(whole, "local t = { kind = ... } return 'big:' .. t.kind", "=rule", null));
+    try std.testing.expectEqual(api.Status.ok, api.nilu_pushstring(whole, "pay"));
+    try std.testing.expectEqual(api.Status.ok, api.nilu_pcall(whole, 1, 1, 0));
+    api.nilu_close(whole);
+    var refuse: usize = 1;
+    while (refuse <= probe.requests) : (refuse += 1) {
+        var refusal = Refusal{ .refuse = refuse };
+        if (api.nilu_newstate(refusingAlloc, &refusal)) |state| {
+            var status = api.nilu_openlibs(state);
+            if (status == .ok) status = api.nilu_loadnamed(state, "local t = { kind = ... } return 'big:' .. t.kind", "=rule", null);
+            if (status == .ok) status = api.nilu_pushstring(state, "pay");
+            if (status == .ok) status = api.nilu_pcall(state, 1, 1, 0);
+            switch (status) {
+                .ok => try std.testing.expectEqualStrings("big:pay", std.mem.span(api.nilu_tolstring(state, -1, null).?)),
+                .memory => {},
+                .runtime => try std.testing.expectEqualStrings("not enough memory", std.mem.span(api.nilu_tolstring(state, -1, null).?)),
+                else => return error.TestUnexpectedResult,
+            }
+            api.nilu_close(state);
+        }
+        try std.testing.expectEqual(@as(isize, 0), refusal.ledger.blocks);
+        try std.testing.expectEqual(@as(isize, 0), refusal.ledger.bytes);
+    }
+}
+
 const Probe = struct {
     start: *std.atomic.Value(bool),
     offset: f64,

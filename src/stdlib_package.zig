@@ -26,7 +26,7 @@ pub fn open(call: Call) Error!void {
     // "string"` answers the table without asking the reader.
     for ([_][:0]const u8{ "string", "table", "math", "utf8" }) |name| {
         try call.push(name);
-        _ = api.nilu_getglobal(call.state, name.ptr);
+        try call.check(api.nilu_getglobal(call.state, name.ptr));
         try call.check(api.nilu_settable(call.state, -3));
     }
     try call.push("loaded");
