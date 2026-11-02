@@ -1,0 +1,5 @@
+local t = {}
+for i = 1, 200000 do t["k" .. tostring(i)] = i end
+local s = 0
+for i = 1, 200000 do s = s + t["k" .. tostring(i)] end
+print(s)

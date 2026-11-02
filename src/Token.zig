@@ -1,0 +1,92 @@
+const std = @import("std");
+const Token = @This();
+
+kind: Kind,
+span: Span,
+position: Position,
+number: ?f64 = null,
+/// Set instead of `number` for a numeral that is an integer
+/// (`numeral.Parsed`).
+integer: ?i64 = null,
+string: ?StringLiteral = null,
+
+/// The longest source that loads. Offsets, lines and columns are 32-bit, so
+/// that a syntax tree node stays small; a source's end offset is its length,
+/// and its last line or column at most one more.
+pub const max_source_bytes: usize = std.math.maxInt(u32) - 1;
+pub const Position = struct { offset: u32, line: u32, column: u32 };
+pub const Span = struct { start: u32, end: u32 };
+pub const StringLiteral = struct { contents: Span, long_level: ?usize };
+pub const Kind = enum {
+    eof,
+    name,
+    number,
+    string,
+    invalid,
+    @"and",
+    @"break",
+    do,
+    @"else",
+    elseif,
+    end,
+    false,
+    @"for",
+    function,
+    goto,
+    @"if",
+    in,
+    local,
+    nil,
+    not,
+    @"or",
+    repeat,
+    @"return",
+    then,
+    true,
+    until,
+    @"while",
+    @"+",
+    @"-",
+    @"*",
+    @"/",
+    @"//",
+    @"%",
+    @"^",
+    @"#",
+    @".",
+    @"..",
+    @"...",
+    @"=",
+    @"==",
+    @"~=",
+    @"<",
+    @"<=",
+    @">",
+    @">=",
+    @"&",
+    @"|",
+    @"~",
+    @"<<",
+    @">>",
+    @"(",
+    @")",
+    @"{",
+    @"}",
+    @"[",
+    @"]",
+    @";",
+    @":",
+    @"::",
+    @",",
+};
+
+pub const keywords = std.StaticStringMap(Kind).initComptime(.{
+    .{ "and", .@"and" },     .{ "break", .@"break" }, .{ "do", .do },
+    .{ "else", .@"else" },   .{ "elseif", .elseif },  .{ "end", .end },
+    .{ "false", .false },    .{ "for", .@"for" },     .{ "function", .function },
+    .{ "goto", .goto },      .{ "if", .@"if" },       .{ "in", .in },
+    .{ "local", .local },    .{ "nil", .nil },        .{ "not", .not },
+    .{ "or", .@"or" },       .{ "repeat", .repeat },  .{ "return", .@"return" },
+    .{ "then", .then },      .{ "true", .true },      .{ "until", .until },
+    .{ "while", .@"while" },
+});

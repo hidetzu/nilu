@@ -1,0 +1,3 @@
+local t = {}
+local a = t.x
+local b = a.y

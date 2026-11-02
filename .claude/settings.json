@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(zig build:*)",
+      "Bash(mise exec -- zig build:*)",
+      "Bash(node tools/:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)"
+    ],
+    "deny": [
+      "Bash(git add -A*)",
+      "Bash(git add --all*)",
+      "Bash(git add .)",
+      "Bash(git commit -m *)",
+      "Bash(git commit -am *)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git push * --force*)",
+      "Bash(git push * -f*)",
+      "Bash(git push origin main*)",
+      "Bash(git reset --hard*)",
+      "Bash(git reset * --hard*)",
+      "Bash(git clean -f*)",
+      "Bash(git clean -*f*)",
+      "Bash(git checkout -- *)",
+      "Bash(git checkout .)",
+      "Bash(git restore .)",
+      "Bash(git restore --source*)",
+      "Bash(git tag *)",
+      "Bash(gh repo edit *)",
+      "Bash(gh release *)",
+      "Bash(gh pr merge *--auto*)",
+      "Bash(gh pr merge *--admin*)"
+    ]
+  }
+}

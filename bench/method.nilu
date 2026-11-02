@@ -1,0 +1,8 @@
+local P = {}
+P.__index = P
+function P.new(x, y) return setmetatable({x = x, y = y}, P) end
+function P:add(o) return P.new(self.x + o.x, self.y + o.y) end
+local a = P.new(0, 0)
+local d = P.new(1, 2)
+for i = 1, 500000 do a = a:add(d) end
+print(a.x, a.y)

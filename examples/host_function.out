@@ -1,0 +1,5 @@
+10	0
+1	2	3
+failed: [string "print(clamp('high', 0, 10))"]:1: bad argument #1 to 'clamp' (number expected, got string)
+failed: clamp: lo is above hi
+greet answered: hello, host!

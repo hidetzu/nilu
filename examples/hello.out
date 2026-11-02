@@ -1,0 +1,3 @@
+hello from Nilu	3	2.5
+failed: [string "local t = nil..."]:2: attempt to index a nil value (local 't')
+failed: [string "print('unfinished'"]:1:19: ')' expected near <eof>

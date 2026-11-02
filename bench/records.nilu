@@ -1,0 +1,6 @@
+local s = 0
+for i = 1, 500000 do
+  local r = {a = i, b = i, c = i, d = i, e = i}
+  s = s + r.c
+end
+print(s)

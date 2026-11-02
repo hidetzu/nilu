@@ -1,0 +1,4 @@
+#!/usr/bin/env nilu
+print("one")
+local a = nil
+print(a.x)

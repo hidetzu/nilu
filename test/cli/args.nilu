@@ -1,0 +1,3 @@
+print(...)
+print(arg[0], arg[1], arg[2], #arg)
+print(select("#", ...))

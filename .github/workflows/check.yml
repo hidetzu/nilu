@@ -1,0 +1,24 @@
+name: checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v5
+      # `cc` is the runner's own C compiler; `c-test` compiles the carried
+      # suite with it as well as with `zig cc`, and reports NOT-RUN without it.
+      - run: zig version && node --version && cc --version
+      # The complete gate (`check` in build.zig): the stage gate, the source
+      # tests, the carried C suite under both compilers, the command cases,
+      # every example of both manuals, the embedding example and the complete
+      # document check. `dist` is not part of it; a release is built on purpose.
+      - run: zig build check --summary all

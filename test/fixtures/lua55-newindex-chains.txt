@@ -1,0 +1,10 @@
+# Newindex-chain results captured from Lua 5.5 on 2026-10-24.
+# Table-valued handler count; terminal key present; outcome.
+0 false stored
+0 true stored
+1999 false stored
+1999 true stored
+2000 false runtime
+2000 true stored
+2001 false runtime
+2001 true runtime

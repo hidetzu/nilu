@@ -1,0 +1,10 @@
+# Index-chain results captured from Lua 5.5 on 2026-10-24.
+# Table-valued handler count; terminal key present; result class; binary64 bits or -.
+0 false nil -
+0 true number 401c000000000000
+1999 false nil -
+1999 true number 401c000000000000
+2000 false runtime -
+2000 true number 401c000000000000
+2001 false runtime -
+2001 true runtime -

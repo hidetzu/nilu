@@ -1,0 +1,8 @@
+.zig-cache/
+zig-out/
+.env
+.envrc
+REVIEW.md
+tmp/
+.claude/settings.local.json
+.claude/worktrees/

@@ -1,0 +1,3 @@
+# Nilu's syntax is Lua 5.5's, so GitHub highlights a .nilu file as Lua and
+# counts it as Lua in the language bar; Linguist knows no Nilu.
+*.nilu linguist-language=Lua

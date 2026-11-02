@@ -1,0 +1,149 @@
+{
+  "verbatim": {
+    "LICENSE": "cc30137fcd9e6ea36d18d33e34014d5ee4259ed4ae9e07edc3bc8337a4fee0f4",
+    "test/install/stack.c": "0584e9928c8ec0c6a569ae976195838dba8b7e0830f51a387a816f7ab6017617",
+    "test/cli/args.nilu": "5c2ee0f5a7e6c611847a015ef8aa36394a281a8e414ff2dbcff1cd9833f61715",
+    "test/cli/bad.nilu": "a4a4e7d650c245db9b01803207c40cd3e8701cc5189ecafa621419d3d08062bc",
+    "test/cli/fails.nilu": "7bfd2f6219d9ed9276234a25912cf6ac81a87442f81df5196841ffd0a0750080",
+    "test/cli/hash.nilu": "d9c4da4e0a94059275f57cdefcefa795daae661575176a4966aedf004c3f4fd5",
+    "test/cli/hello.nilu": "b1dff07470b6f4fb81a6cd9fcb4629811552737e36d56e3ed5cae186663d9ba0",
+    "test/cli/only-shebang.nilu": "009fbca422b9169e4a350a6aa38d3830d038361d5496760ba2b0a9f61244d40a",
+    "test/cli/shebang-fails.nilu": "1d7ba7d648eabd631f8aec774155fa24c5ad6157670565fc54d1f554d3cd6cf3",
+    "test/cli/shebang.nilu": "a92679fee87f8e3ece1131569c3811da889238bac4267cc8326f6e92d0d1ee27",
+    "test/fixtures/lua55-numerals.txt": "3a43d2e57426c78df2b47fdcb9a39a62a77d623182a61be6099303d8a2297e04"
+  },
+  "manuals": {
+    "doc/ja/01-getting-started.md": {
+      "blocks": "c37321d75c57a11d2932f44897a8252669f3856b383cbf013a3832c2b7e4087a",
+      "headings": "50ace3298ad68eb5ea2d53cf7290dae4ae414a954d9789e0b380826a666e78d8"
+    },
+    "doc/ja/02-values.md": {
+      "blocks": "3bbca005a5de902448741bbac33e79dc96db8f8a530b662278c6087f1ec805e4",
+      "headings": "4994f3b4202d8f62d886297a8042eba56ed1e19348b145325d5cf8df29bf5cf5"
+    },
+    "doc/ja/03-variables.md": {
+      "blocks": "2fa4a0833caf16576087094a7df1a2e007e34318ea27564b8af2320da812fcb7",
+      "headings": "4882eebc5a9b88d25a739c7c83270945b3cb06b5aa2b12986ac818d57dcf9dfa"
+    },
+    "doc/ja/04-statements.md": {
+      "blocks": "a15dc9699483a6c1598d48da6b422ec715a9f17a0cedf98488cb8070b466fc6e",
+      "headings": "020d5036148dfe4ff7991c6dfd2b2834e332b468ecfc67ff28bce4771876b753"
+    },
+    "doc/ja/05-expressions.md": {
+      "blocks": "77def150e0cb95b0ff7df598f2144005cb392d1d69cc615aef032786ed57be71",
+      "headings": "8f96f225eec988bd5b47d2a936a6f421d0090ccd09c8f24dcd066140d17a0988"
+    },
+    "doc/ja/06-functions.md": {
+      "blocks": "4c851c6d3db3e7876550e8014fab931c535294519b77e778b60b2e75dd6db03a",
+      "headings": "2322dee715ed6d5884b3827ac47b2d843e64dd4d3fca85eb5ba00cbc62bb86d4"
+    },
+    "doc/ja/07-metatables.md": {
+      "blocks": "74b01950284ef2bf7bfdb9dee15e9e5b910500e4e9b4661d1222d90db0f6bf46",
+      "headings": "b8ca69ff4fe6aaa4aaea617ad4dd879c8baed531dd6d12e907d3b81ea083ef01"
+    },
+    "doc/ja/08-failure.md": {
+      "blocks": "7b67a5daeb387d6ba3980b59f63b220339eb41d262ade377a7ae2454888502ed",
+      "headings": "00e027c7425551cc6b911f81a1e86be2277d2f19ddf2452206d9ee49bc9d59b4"
+    },
+    "doc/ja/09-gc.md": {
+      "blocks": "1ad24c1afe986e303728bef359ff193e020a9c0335bb200aa256da81543a2b30",
+      "headings": "2353b9f9ec49c367afcc891ce22e062db75d1b8d665dea90a0c8023b6b772365"
+    },
+    "doc/ja/10-library.md": {
+      "blocks": "82ad577d0fdb66dc9669b2fb8977b9e9687ffc8ce452e71a8a6a69911c4f7096",
+      "headings": "0a2a033a9a23e25219b66cbff0595b4c0328774c9ad6be2c9b6bbca79fbfb422"
+    },
+    "doc/ja/11-nilu-command.md": {
+      "blocks": "93cc2aba51765696c1b3718796877426ceb1e59d62e9e744174cc5a0cfdcb164",
+      "headings": "c6c16d517adc4877198865085e0c9ba095e98bc1ae4534d11ac2a050935d6bb0"
+    },
+    "doc/ja/12-embedding.md": {
+      "blocks": "6025065e1e10f957c02d5c51e421632da43bf6850d1798656fd9004250f36184",
+      "headings": "8e3df870cc98fb341c9a0873a03810b0c87cd32a82140458d9df7d5dad5d70ac"
+    },
+    "doc/ja/13-differences-from-lua.md": {
+      "blocks": "3b20bb0a5be6ae8c0efb12cad92434af501d954fb10dd4800363a6a7f07d7556",
+      "headings": "ef87b26ae94f989f36aa9fc04c31b41060dccde1865a65ead0933b6eecc34cf3"
+    },
+    "doc/ja/14-porting.md": {
+      "blocks": "90f592d13ea17bee70e8ee8bccb44ffd57086f2d486f003ff90fdba37193cbbb",
+      "headings": "d433f3ce36f90e706ab11f2a8b4e221fc801da80377b4c9df5ec81495c96c79e"
+    },
+    "doc/ja/15-grammar.md": {
+      "blocks": "8001000722f6107b7b609f982a5f68e2237b2084a0f39d65da7b0f9ee60efe4a",
+      "headings": "50ace3298ad68eb5ea2d53cf7290dae4ae414a954d9789e0b380826a666e78d8"
+    },
+    "doc/ja/README.md": {
+      "blocks": "f9c6b2a2d17ff35f2d54f2e9a89ae9952737ddcaab7d7db6dee59b5cc9bf95e1",
+      "headings": "c87a0b507cd70dc26bd56b10f736aea70c0643ffd8067f543b23cd0079f2ece9"
+    },
+    "doc/en/01-getting-started.md": {
+      "blocks": "c37321d75c57a11d2932f44897a8252669f3856b383cbf013a3832c2b7e4087a",
+      "headings": "50ace3298ad68eb5ea2d53cf7290dae4ae414a954d9789e0b380826a666e78d8"
+    },
+    "doc/en/02-values.md": {
+      "blocks": "3bbca005a5de902448741bbac33e79dc96db8f8a530b662278c6087f1ec805e4",
+      "headings": "4994f3b4202d8f62d886297a8042eba56ed1e19348b145325d5cf8df29bf5cf5"
+    },
+    "doc/en/03-variables.md": {
+      "blocks": "2fa4a0833caf16576087094a7df1a2e007e34318ea27564b8af2320da812fcb7",
+      "headings": "4882eebc5a9b88d25a739c7c83270945b3cb06b5aa2b12986ac818d57dcf9dfa"
+    },
+    "doc/en/04-statements.md": {
+      "blocks": "a15dc9699483a6c1598d48da6b422ec715a9f17a0cedf98488cb8070b466fc6e",
+      "headings": "020d5036148dfe4ff7991c6dfd2b2834e332b468ecfc67ff28bce4771876b753"
+    },
+    "doc/en/05-expressions.md": {
+      "blocks": "77def150e0cb95b0ff7df598f2144005cb392d1d69cc615aef032786ed57be71",
+      "headings": "8f96f225eec988bd5b47d2a936a6f421d0090ccd09c8f24dcd066140d17a0988"
+    },
+    "doc/en/06-functions.md": {
+      "blocks": "4c851c6d3db3e7876550e8014fab931c535294519b77e778b60b2e75dd6db03a",
+      "headings": "2322dee715ed6d5884b3827ac47b2d843e64dd4d3fca85eb5ba00cbc62bb86d4"
+    },
+    "doc/en/07-metatables.md": {
+      "blocks": "74b01950284ef2bf7bfdb9dee15e9e5b910500e4e9b4661d1222d90db0f6bf46",
+      "headings": "b8ca69ff4fe6aaa4aaea617ad4dd879c8baed531dd6d12e907d3b81ea083ef01"
+    },
+    "doc/en/08-failure.md": {
+      "blocks": "7b67a5daeb387d6ba3980b59f63b220339eb41d262ade377a7ae2454888502ed",
+      "headings": "00e027c7425551cc6b911f81a1e86be2277d2f19ddf2452206d9ee49bc9d59b4"
+    },
+    "doc/en/09-gc.md": {
+      "blocks": "1ad24c1afe986e303728bef359ff193e020a9c0335bb200aa256da81543a2b30",
+      "headings": "2353b9f9ec49c367afcc891ce22e062db75d1b8d665dea90a0c8023b6b772365"
+    },
+    "doc/en/10-library.md": {
+      "blocks": "82ad577d0fdb66dc9669b2fb8977b9e9687ffc8ce452e71a8a6a69911c4f7096",
+      "headings": "0a2a033a9a23e25219b66cbff0595b4c0328774c9ad6be2c9b6bbca79fbfb422"
+    },
+    "doc/en/11-nilu-command.md": {
+      "blocks": "93cc2aba51765696c1b3718796877426ceb1e59d62e9e744174cc5a0cfdcb164",
+      "headings": "c6c16d517adc4877198865085e0c9ba095e98bc1ae4534d11ac2a050935d6bb0"
+    },
+    "doc/en/12-embedding.md": {
+      "blocks": "6025065e1e10f957c02d5c51e421632da43bf6850d1798656fd9004250f36184",
+      "headings": "8e3df870cc98fb341c9a0873a03810b0c87cd32a82140458d9df7d5dad5d70ac"
+    },
+    "doc/en/13-differences-from-lua.md": {
+      "blocks": "3b20bb0a5be6ae8c0efb12cad92434af501d954fb10dd4800363a6a7f07d7556",
+      "headings": "ef87b26ae94f989f36aa9fc04c31b41060dccde1865a65ead0933b6eecc34cf3"
+    },
+    "doc/en/14-porting.md": {
+      "blocks": "90f592d13ea17bee70e8ee8bccb44ffd57086f2d486f003ff90fdba37193cbbb",
+      "headings": "d433f3ce36f90e706ab11f2a8b4e221fc801da80377b4c9df5ec81495c96c79e"
+    },
+    "doc/en/15-grammar.md": {
+      "blocks": "8001000722f6107b7b609f982a5f68e2237b2084a0f39d65da7b0f9ee60efe4a",
+      "headings": "50ace3298ad68eb5ea2d53cf7290dae4ae414a954d9789e0b380826a666e78d8"
+    },
+    "doc/en/README.md": {
+      "blocks": "f9c6b2a2d17ff35f2d54f2e9a89ae9952737ddcaab7d7db6dee59b5cc9bf95e1",
+      "headings": "c87a0b507cd70dc26bd56b10f736aea70c0643ffd8067f543b23cd0079f2ece9"
+    }
+  },
+  "cTests": {
+    "test/c/smoke.c": "dcbe34e13e81efcb144581e190e276a29c6e8d839c5686fae2270943802f0c5c",
+    "test/c/cli.c": "d11b9705d5dc6510098df90db2a38287308b8915fcbe253a7de396146061f71a"
+  }
+}
