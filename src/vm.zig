@@ -1392,8 +1392,14 @@ pub fn closeOnFailure(state: *runtime.State, level: usize) void {
         var replaced = carried;
         switch (result) {
             .success => {},
-            .failure => {
+            .failure => |kind| {
                 const value = state.stack.pop() orelse Value.nil;
+                // The hook stopped this `__close`: the program stops, and the
+                // interruption, not the failure being closed for, goes on.
+                if (kind == .interrupted) {
+                    state.failure = .{ .kind = .interrupted, .value = .nil, .origin = .native };
+                    continue;
+                }
                 if (replaced) |*record| {
                     record.value = value;
                     record.needs_message = false;

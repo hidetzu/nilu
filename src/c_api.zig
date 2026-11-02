@@ -1129,6 +1129,12 @@ pub export fn nilu_resume(maybe_state: ?*runtime.State, index: c_int, nargs: c_i
         },
         .failed => |kind| {
             if (nresults) |out| out.* = 1;
+            // The coroutine ran on its own thread, whose flag its own entry
+            // cleared. Inside a host's call the interruption still stops the
+            // program, so the resuming thread takes it up: the C function
+            // that resumed cannot answer it away. A host's own resume gets
+            // the status alone; a flag left set would stop its next call.
+            if (kind == .interrupted and state.execution != null) state.interrupted = true;
             return callStatus(state, kind, "nilu_resume");
         },
     }

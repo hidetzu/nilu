@@ -105,3 +105,69 @@ test "interruption reaches the host through a script's call of a C function that
     try std.testing.expectEqual(api.Status.interrupted, inner_status);
     try std.testing.expectEqual(@backingInt(api.Type.nil), api.nilu_type(state, -1));
 }
+
+var stops: usize = 0;
+
+/// Stops at its third call. Called every 1000 instructions, it lets the few
+/// instructions before a loop run, so the stop falls inside the loop.
+fn stopThird(_: ?*runtime.State) callconv(.c) c_int {
+    stops += 1;
+    return @intFromBool(stops >= 3);
+}
+
+/// Runs `source` with the libraries open until the hook stops it inside its
+/// endless loop: the host's protected call answers the interruption with nil,
+/// and the host's next call runs.
+fn interruptedRun(source: [*:0]const u8) !void {
+    const state = try api.create(a);
+    defer api.nilu_close(state);
+    try std.testing.expectEqual(api.Status.ok, api.nilu_openlibs(state));
+    stops = 0;
+    api.nilu_sethook(state, stopThird, 1000);
+    try std.testing.expectEqual(api.Status.ok, api.nilu_loadnamed(state, source, "=stopped", null));
+    try std.testing.expectEqual(api.Status.interrupted, api.nilu_pcall(state, 0, 1, 0));
+    try std.testing.expectEqual(@backingInt(api.Type.nil), api.nilu_type(state, -1));
+    try std.testing.expectEqual(@as(usize, 3), stops);
+    api.nilu_sethook(state, null, 0);
+    try std.testing.expectEqual(api.Status.ok, api.nilu_settop(state, 0));
+    try std.testing.expectEqual(api.Status.ok, api.nilu_loadnamed(state, "return 1 + 1", "=next", null));
+    try std.testing.expectEqual(api.Status.ok, api.nilu_pcall(state, 0, 1, 0));
+    try std.testing.expectEqual(@as(c_longlong, 2), api.nilu_tointegerx(state, -1, null));
+}
+
+// coroutine.resume and the function coroutine.wrap makes are C functions in
+// between: the coroutine runs on its own thread, and its interruption still
+// reaches the host's call, not as a failure the resume answers.
+test "interruption inside a coroutine reaches the host's call" {
+    try interruptedRun("local co = coroutine.create(function() while true do end end) local ok = coroutine.resume(co) return 'resumed'");
+    try interruptedRun("coroutine.wrap(function() while true do end end)() return 'resumed'");
+}
+
+// A failure on its way to the host closes `<close>` variables first; when
+// the hook stops a `__close` there, what reaches the host is the
+// interruption, not the failure it was closing for.
+test "interruption inside a __close that a failure runs reaches the host's call" {
+    try interruptedRun("do local x <close> = setmetatable({}, {__close = function() while true do end end}) error('e') end");
+}
+
+// A host's own nilu_resume is the host's call: it answers the interruption,
+// and the host's next call runs.
+test "interruption a host's own resume answers leaves the next call running" {
+    const state = try api.create(a);
+    defer api.nilu_close(state);
+    try std.testing.expectEqual(api.Status.ok, api.nilu_loadnamed(state, "while true do end", "=looping", null));
+    try std.testing.expectEqual(api.Status.ok, api.nilu_newthread(state));
+    stops = 0;
+    api.nilu_sethook(state, stopThird, 1000);
+    var count: c_int = 0;
+    try std.testing.expectEqual(api.Status.interrupted, api.nilu_resume(state, 1, 0, &count));
+    try std.testing.expectEqual(@as(usize, 3), stops);
+    api.nilu_sethook(state, null, 0);
+    try std.testing.expectEqual(api.Status.ok, api.nilu_settop(state, 0));
+    // A C function's return is what an interruption left standing would
+    // replace, so the next call is one.
+    counter = 0;
+    try std.testing.expectEqual(api.Status.ok, api.nilu_pushcfunction(state, counted));
+    try std.testing.expectEqual(api.Status.ok, api.nilu_call(state, 0, 0));
+    try std.testing.expectEqual(@as(usize, 1), counter);
+}
