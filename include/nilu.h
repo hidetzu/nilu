@@ -466,7 +466,8 @@ void nilu_sethook(NiluState *N, NiluHook hook, unsigned int count);
  * the stack. The library itself is written against this header alone. */
 NiluStatus nilu_openlibs(NiluState *N);
 /* Opens only the libraries whose bits are set, in nilu_openlibs's order; the
- * values are Lua 5.5's (io and os are the host's). Unknown bits are ignored. */
+ * values are Lua 5.5's (io and os are the host's). Unknown bits are ignored.
+ * load comes with NILU_LIB_PACKAGE, with require, dofile and loadfile. */
 #define NILU_LIB_BASE 1
 #define NILU_LIB_PACKAGE 2
 #define NILU_LIB_COROUTINE 4

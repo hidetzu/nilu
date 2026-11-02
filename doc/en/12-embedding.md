@@ -81,7 +81,8 @@ int main(void) {
 The state owns the memory, so there is nothing the host frees individually.
 `nilu_openlibs` opens every library; `nilu_openselectedlibs(N, NILU_LIB_BASE | NILU_LIB_STRING)`
 opens only those named (`NILU_LIB_BASE`, `_PACKAGE`, `_COROUTINE`, `_DEBUG`, `_MATH`, `_STRING`,
-`_TABLE`, `_UTF8`, with Lua 5.5's values), for a program that should have no more.
+`_TABLE`, `_UTF8`, with Lua 5.5's values), for a program that should have no more. `load` comes
+with `NILU_LIB_PACKAGE`, where Lua puts it in the base library.
 `nilu_newstate(f, ud)` makes a state whose memory comes from the host's `f`, in Lua's `lua_Alloc`
 shape (`f(ud, NULL, 0, n)` allocates, `f(ud, p, old, 0)` frees, `f(ud, p, old, n)` reallocates,
 NULL when it cannot); `nilu_close` gives every block back through it. Its memory must be aligned as
@@ -364,6 +365,22 @@ callback receives `NILU_ERR_INTERRUPTED` from it, and what happens to the outer
 call is decided by the callback's own return value alone. A callback that calls
 again at every stop runs out at the ordinary call limit ([8.2](08-failure.md#82-the-kinds-of-failure)),
 and a `nilu_sethook` made inside a callback applies to the whole state at once.
+
+**How far a host controls a program. Nilu is not a sandbox.** What follows is what a host can rely on, what it must do itself, and
+what nothing in Nilu can promise today.
+
+| | Nilu guarantees | The host must | Not guaranteed today |
+|---|---|---|---|
+| Nilu code that does not stop | The hook runs every so many VM instructions in all Nilu code: inside `pcall`, coroutines, metamethods, message handlers, `__close` and functions from `load`. A stop answers `NILU_ERR_INTERRUPTED` with `nil`, and `pcall` does not catch it ([12.5](#125-stopping-a-program-that-does-not-stop)). | Set a hook, and decide when to stop. | — |
+| Work in C | — | Keep its own C functions short: the hook does not count them. | One library call runs to its end without the hook: pattern matching (`string.find`, `match`, `gmatch`, `gsub`), `table.sort` without a comparator, `string.rep`, `load`. **The time a pattern takes has no bound**, since a program chooses both the text and the pattern. A host that cannot accept this leaves out `NILU_LIB_STRING`, or stops the whole thread from outside. |
+| Memory | Every refusal of the host's allocator answers `NILU_ERR_MEMORY` or `not enough memory`, the state can be used afterwards, and `nilu_close` gives every block back. | Give `nilu_newstate` an allocator that refuses past its limit. **After a refusal, call `nilu_gc(N, NILU_GCCOLLECT, NULL)` before the next call**: the garbage that filled the limit has not been collected yet, and the next call fails too. Set a hook as well: a program's `pcall` catches running out of memory and can go on. | How far below the limit the peak stays: a collection is started by the number of objects ([9.3](09-gc.md#93-when-it-happens)). |
+| Depth | A recursion too deep, too many results and a source nested too deeply are failures, not crashes. | — | — |
+| After an abnormal end | After an interruption, a memory failure (with `nilu_gc`), a runtime error, a call too deep or a syntax error, the next call runs and the globals are as they were. | Put back the globals a program replaced, if they matter; a second `nilu_openlibs` restores the library's. | — |
+| Outside the state | The core reads no file, clock, environment or process. There is no `io` or `os`. Loading reads only through the host's reader, and `print` writes only through the host's writer. | Choose the libraries with `nilu_openselectedlibs`. Leaving out `NILU_LIB_PACKAGE` leaves out `load`, `require`, `dofile` and `loadfile` together. | — |
+| Threads | — | Use a state from one thread at a time. | — |
+
+What the table says was observed for the programs this repository runs. It is not a proof for every
+program.
 
 ## 12.5.1. Seeing where it failed
 
