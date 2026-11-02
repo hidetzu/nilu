@@ -232,6 +232,13 @@ NiluStatus nilu_gettable(NiluState *N, int index);
 NiluStatus nilu_settable(NiluState *N, int index);
 NiluStatus nilu_getglobal(NiluState *N, const char *name);
 NiluStatus nilu_setglobal(NiluState *N, const char *name);
+/* t[key] with a string key, as Lua's lua_getfield and lua_setfield: gettable
+ * and settable with the key made from `key`, which must be non-NULL
+ * NUL-terminated text. getfield appends the value; setfield consumes the top
+ * value. The table is the value at index, which must exist or abort naming the
+ * entry; failures are reported as for gettable and settable. */
+NiluStatus nilu_getfield(NiluState *N, int index, const char *key);
+NiluStatus nilu_setfield(NiluState *N, int index, const char *key);
 
 /* Load NUL-terminated text without executing. Source/name must be non-NULL;
  * misuse aborts naming the entry point. loadstring uses source as its chunk name;

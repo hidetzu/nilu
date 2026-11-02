@@ -295,6 +295,30 @@ pub export fn nilu_setglobal(maybe_state: ?*runtime.State, maybe_name: ?[*:0]con
     return tableOperation(state, .{ .set = .{ .from(.{ .table = state.globals }), .from(.{ .string = key }), value } }, 1, false, "nilu_setglobal");
 }
 
+/// t[key] for the value at `index` and a string key, as Lua's lua_getfield:
+/// gettable with the key made from `key`, so `__index` runs as it would.
+pub export fn nilu_getfield(maybe_state: ?*runtime.State, index: c_int, maybe_key: ?[*:0]const u8) Status {
+    const state = require(maybe_state, "nilu_getfield");
+    const slot = requireIndex(state, index, "nilu_getfield");
+    const name = maybe_key orelse @panic("nilu_getfield: key is NULL");
+    // Check the public result window before allocating the copied key.
+    const status = reservePush(state);
+    if (status != .ok) return status;
+    const key = state.newString(std.mem.span(name)) catch return memory(state);
+    return tableOperation(state, .{ .get = .{ state.stack.items[slot], .from(.{ .string = key }) } }, 0, true, "nilu_getfield");
+}
+
+/// t[key] = the top value, for the value at `index`, as Lua's lua_setfield:
+/// settable with the key made from `key`, so `__newindex` runs as it would.
+pub export fn nilu_setfield(maybe_state: ?*runtime.State, index: c_int, maybe_key: ?[*:0]const u8) Status {
+    const state = require(maybe_state, "nilu_setfield");
+    const slot = requireIndex(state, index, "nilu_setfield");
+    const name = maybe_key orelse @panic("nilu_setfield: key is NULL");
+    const value = state.get(-1) orelse @panic("nilu_setfield: no visible value");
+    const key = state.newString(std.mem.span(name)) catch return memory(state);
+    return tableOperation(state, .{ .set = .{ state.stack.items[slot], .from(.{ .string = key }), value } }, 1, false, "nilu_setfield");
+}
+
 pub export fn nilu_len(maybe_state: ?*runtime.State, index: c_int) Status {
     const state = require(maybe_state, "nilu_len");
     const slot = requireIndex(state, index, "nilu_len");
