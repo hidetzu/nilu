@@ -1,3 +1,5 @@
+[![Actions Status: checks](https://github.com/hidetzu/nilu/actions/workflows/check.yml/badge.svg?branch=main)](https://github.com/hidetzu/nilu/actions/workflows/check.yml?query=branch%3Amain)
+
 # Nilu
 
 Nilu is a small scripting language for embedding in C applications. Use scripts
@@ -18,7 +20,7 @@ cases, and `zig build dist` builds the release artifacts; no release is publishe
 
 A script can calculate settings and return them to its host:
 
-```nilu
+```lua
 local function pixels(units)
   return units * 16
 end
