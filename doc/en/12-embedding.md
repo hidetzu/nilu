@@ -23,7 +23,11 @@ Before choosing a state lifetime, read the [collection limits](09-gc.md).
 Loaded function bodies remain until `nilu_close`, and collection runs only
 between VM instructions. Repeated loading in a long-lived state therefore
 retains memory; host-only allocation does not itself trigger collection. Load
-once and reuse the function when possible. Recreating a state releases its
+once and reuse the function when possible; loading the same text again keeps
+another copy. A state also keeps up to 4 MiB of the small blocks it has freed,
+to reuse them, and gives them back to the allocator only at `nilu_close`.
+`nilu_gc(NILU_GCCOUNT)` does not count them, so a host's own count of what its
+allocator holds can be higher by that much. Recreating a state releases its
 memory, but also loses its globals, closures and other values; the host must
 restore what it needs. Userdata has no finalizer, so the host must explicitly
 close external resources such as files and sockets.
