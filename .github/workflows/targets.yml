@@ -48,6 +48,23 @@ jobs:
       - name: test
         run: zig build test --summary all
         continue-on-error: true
+      - name: the test binary run directly
+        if: runner.os != 'Windows'
+        shell: bash
+        continue-on-error: true
+        run: |
+          bin=$(ls -t .zig-cache/o/*/test | head -1)
+          set +e
+          "$bin" > direct.out 2> direct.err
+          echo "exit status $?"
+          tail -c 3000 direct.err
+          echo "--- stdout tail"
+          tail -c 1000 direct.out
+          echo "--- stderr bytes $(wc -c < direct.err)"
+      - name: failure_handling tests alone
+        if: runner.os != 'Windows'
+        run: zig build test -Dtest-filter=failure_handling --summary all
+        continue-on-error: true
       - name: c-test
         run: zig build c-test --summary all
         continue-on-error: true
