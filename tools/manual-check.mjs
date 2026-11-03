@@ -199,6 +199,10 @@ function main() {
       chapters.push({ chapter: `${language}/${name}`, text: readFileSync(join(directory, name), 'utf8') });
     }
   }
+  // The README shows a newcomer a first program, and is held to the same
+  // promise as the manual (hidetzu/nilu#10).
+  const readme = join(options.root, 'README.md');
+  if (existsSync(readme)) chapters.push({ chapter: 'README.md', text: readFileSync(readme, 'utf8') });
   let cases = [];
   let rows = [];
   let unsettled = 0;
@@ -219,7 +223,7 @@ function main() {
   }
   const counts = language => cases.filter(found => found.chapter.startsWith(`${language}/`)).length;
   if (options.list) {
-    console.log(`manual-check: ${cases.length} example blocks (en ${counts('en')}, ja ${counts('ja')}) and ${rows.length} refused rows, none run; ${unsettled} rows cannot be settled by running`);
+    console.log(`manual-check: ${cases.length} example blocks (en ${counts('en')}, ja ${counts('ja')}, README ${cases.filter(found => found.chapter === 'README.md').length}) and ${rows.length} refused rows, none run; ${unsettled} rows cannot be settled by running`);
     for (const found of cases) console.log(`  ${found.id} ${found.kind}`);
     for (const row of rows) console.log(`  ${row.id} refused ${JSON.stringify(row.source)}`);
     return 0;
@@ -227,7 +231,7 @@ function main() {
   const version = run(options.nilu, ['-v'], options.root, '');
   if (version.status !== 0 || !/^nilu \S+\n$/.test(version.stdout)) throw new Error(`manual-check: ${options.nilu} -v did not answer a version`);
   banner = version.stdout;
-  console.log(`manual-check: running ${cases.length} example blocks (en ${counts('en')}, ja ${counts('ja')}) and ${rows.length} refused rows; ${unsettled} rows cannot be settled by running`);
+  console.log(`manual-check: running ${cases.length} example blocks (en ${counts('en')}, ja ${counts('ja')}, README ${cases.filter(found => found.chapter === 'README.md').length}) and ${rows.length} refused rows; ${unsettled} rows cannot be settled by running`);
   const directory = mkdtempSync(join(tmpdir(), 'nilu-manual-'));
   const failures = [];
   try {

@@ -26,7 +26,7 @@ Nilu は Lua 5.5 に着想を得た、別の言語です。多くを Lua から�
 7. [メタテーブル](07-metatables.md) — `__index`、`__newindex`、演算子のメタメソッド
 8. [失敗](08-failure.md) — 何が失敗になり、何が失敗にならないか
 9. [ガベージコレクション](09-gc.md) — 何が解放され、いつ起きるか
-10. [ライブラリ](10-library.md) — 基本関数と `string`、`table`、`math`、`utf8`
+10. [ライブラリ](10-library.md) — 基本関数と `string`、`table`、`math`、`utf8`、`coroutine`、`debug`
 11. [`nilu` コマンド](11-nilu-command.md) — ファイル、`-e`、標準入力、プロンプト、`io` と `os`
 12. [C から埋め込む](12-embedding.md) — スタック、呼び出し、ホストの関数
 13. [Lua との違い](13-differences-from-lua.md) — 借りたもの、変えたもの、無いもの

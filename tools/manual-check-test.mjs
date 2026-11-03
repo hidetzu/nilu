@@ -44,7 +44,7 @@ const cases = [
     run: () => withManual({ 'doc/en/01-one.md': agreeing }, check => {
       const result = check();
       assert.equal(result.status, 0, result.output);
-      assert.match(result.output, /manual-check: running 3 example blocks \(en 3, ja 0\)/);
+      assert.match(result.output, /manual-check: running 3 example blocks \(en 3, ja 0, README 0\)/);
       assert.match(result.output, /3 of 3 example blocks agree/);
       return 'a nilu block, a stderr pair and a nilu-cli line agree, and nilu-source is not counted';
     }),
