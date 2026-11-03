@@ -58,7 +58,15 @@ test "value_layout NaN bits are kept except for a negative NaN in the tag range"
         \\return table.concat(out, "|")
     , null));
     try std.testing.expectEqual(api.Status.ok, api.nilu_call(state, 0, 1));
-    try std.testing.expectEqualStrings("000000000000f8ff,000000000000f87f|010000000000f87f,010000000000f8ff,000000000000f8ff,000000000000f8ff|010000000000f87f,000000000000f8ff,number,false", std.mem.span(api.nilu_tolstring(state, -1, null).?));
+    // 0/0 is the processor's default NaN, whose sign differs between
+    // processors (negative on x86-64, positive on AArch64); it is kept, and so
+    // is its negation. The other rows name their bits outright.
+    var zero: f64 = 0;
+    std.mem.doNotOptimizeAway(&zero);
+    const default_nan: u64 = @bitCast(zero / zero);
+    var expected: [256]u8 = undefined;
+    const text = try std.fmt.bufPrint(&expected, "{x:0>16},{x:0>16}|010000000000f87f,010000000000f8ff,000000000000f8ff,000000000000f8ff|010000000000f87f,000000000000f8ff,number,false", .{ @byteSwap(default_nan), @byteSwap(default_nan ^ (1 << 63)) });
+    try std.testing.expectEqualStrings(text, std.mem.span(api.nilu_tolstring(state, -1, null).?));
 }
 
 test "value_layout negating a positive NaN in the tag range gives the canonical NaN" {
