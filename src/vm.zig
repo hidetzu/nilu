@@ -2187,8 +2187,9 @@ fn BinaryArm(comptime tag: bytecode.Dispatch) type {
                 const left_slot = &registers[op.left];
                 const right_slot: *const Value = if (op.right_constant) &running.prototype.constants[op.right] else &registers[op.right];
                 // Two numbers run no handler, so the registers slice is still the stack.
-                // The cheap operators are computed here and written straight into the
-                // register; `numbers` stays out of line because of `pow` and `modulo`.
+                // The cheap operators, a float division among them, are computed
+                // here and written straight into the register; `numbers` stays out
+                // of line because of `pow` and `modulo`.
                 const a = left_slot.numberIn() orelse break :fast;
                 const b = right_slot.numberIn() orelse break :fast;
                 const destination = &registers[op.destination];
@@ -2202,7 +2203,9 @@ fn BinaryArm(comptime tag: bytecode.Dispatch) type {
                     .greater_equal => destination.* = .fromBoolean(a >= b),
                     .equal => destination.* = .fromBoolean(a == b),
                     .not_equal => destination.* = .fromBoolean(a != b),
-                    else => destination.* = numbers(op.operator, a, b) orelse break :fast,
+                    else => if (op.operator == .divide) destination.storeNumber(a / b) else {
+                        destination.* = numbers(op.operator, a, b) orelse break :fast;
+                    },
                 }
                 return following(running, instruction, registers, state);
             }
