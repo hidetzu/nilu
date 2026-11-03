@@ -13,6 +13,12 @@ if (result.error) {
   console.error(`NOT-VERIFIED: Zig tests could not run: ${result.error.message}`);
   process.exit(1);
 }
+// A process a signal ended has no status; say which signal, since a crash
+// that cannot print its own panic (a stack overflow) leaves nothing else.
+if (result.signal) {
+  console.error(`zig-tests: the test process was ended by ${result.signal}`);
+  process.exit(1);
+}
 if (result.status !== 0) process.exit(result.status ?? 1);
 const summaries = [...result.stderr.matchAll(/^(?:All (\d+) tests passed\.|(\d+) passed; (\d+) skipped; (\d+) failed\.)$/gm)];
 const summary = summaries.at(-1);

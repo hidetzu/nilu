@@ -33,6 +33,18 @@ jobs:
       - run: node --version; cc --version || echo "no cc"
         shell: bash
         continue-on-error: true
+      - name: stack limit
+        run: ulimit -s || true
+        shell: bash
+        continue-on-error: true
+      - name: one test that stopped the run
+        run: zig build test -Dtest-filter="a protected inner failure is invisible" --summary all
+        continue-on-error: true
+      - name: the same with a 64 MiB stack
+        run: ulimit -s 65520 && zig build test -Dtest-filter="a protected inner failure is invisible" --summary all
+        shell: bash
+        if: runner.os != 'Windows'
+        continue-on-error: true
       - name: test
         run: zig build test --summary all
         continue-on-error: true
