@@ -1,3 +1,7 @@
+# Every text file is checked out with LF endings: the carried fixtures and
+# the manual are read byte by byte, and a CR changes what they say.
+* text=auto eol=lf
+
 # Nilu's syntax is Lua 5.5's, so GitHub highlights a .nilu file as Lua and
 # counts it as Lua in the language bar; Linguist knows no Nilu.
 *.nilu linguist-language=Lua
