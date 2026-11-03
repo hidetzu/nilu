@@ -1,0 +1,7 @@
+local s, x, y = 0.0, 0.5, 1.5
+for i = 1, 2000000 do
+  x = x * 1.000001 + 0.25
+  y = y / 1.000002 - 0.125
+  s = s + x * y / (x + y + 1.0)
+end
+print(string.format("%.6e %.6e %.6e", s, x, y))
