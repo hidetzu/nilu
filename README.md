@@ -69,6 +69,14 @@ the licence for five targets under `zig-out/dist/`, with a `SHA256SUMS` over
 them. Only the host's own binary is run there; the others are built. `dist` is
 not part of `check`, and CI does not run it.
 
+CI also runs each release target on a runner of that target:
+
+| Target | What CI runs there |
+|---|---|
+| x86_64-linux-gnu, aarch64-linux-gnu | `check` |
+| x86_64-macos, aarch64-macos | `check`; three command cases that need Linux (`/dev/full`, `setrlimit(RLIMIT_AS)`) are announced as not run |
+| x86_64-windows-gnu | the source tests only. **Not verified:** a C host linking the library, and the command cases. The command runs; the lines it writes to standard output end in `\r\n` |
+
 ## Embedding in C
 
 The host creates a `NiluState`, provides its own C functions and exchanges values

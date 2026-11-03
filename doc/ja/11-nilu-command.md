@@ -38,6 +38,8 @@ Available options are:
 | `nilu -W hello.nilu` | `warn("@on")` のあとと同じく、警告を入れて走らせる |
 | `nilu -v` | 版を表示する |
 
+Windows では、コマンドが標準出力に書く行は、Lua のコマンドと同じく `\r\n` で終わります。それ以外では `\n` で終わります。
+
 ```sh nilu-cli
 nilu -e 'print(1 + 2)'
 ```

@@ -16,10 +16,25 @@ const result = spawnSync(harness, [nilu, ...fixtures, ...forwarded], { encoding:
 if (result.error) throw result.error;
 process.stdout.write(result.stdout);
 if (result.stderr) process.stderr.write(result.stderr);
-assert.equal(result.status, 0, 'the command cases did not pass');
+// Carried cases that set up a condition only Linux provides (the owner's
+// answer on hidetzu/nilu#8). Elsewhere the harness cannot make that condition,
+// so what such a case reports there says nothing about the command: it is
+// announced as not run, never counted as passed. Any other failure fails.
+const linuxOnly = {
+  'a failed flush says its errno': '/dev/full',
+  'running out of memory says so': 'setrlimit(RLIMIT_AS)',
+  'a count that cannot be read says which way': 'setrlimit(RLIMIT_AS)',
+};
+const failedCases = [...result.stdout.matchAll(/^  FAIL (.+?) - /gm)].map(match => match[1]);
+const notRun = process.platform === 'linux' ? [] : failedCases.filter(name => name in linuxOnly);
+const realFailures = failedCases.filter(name => !notRun.includes(name));
+assert.ok(result.status === 0 || (failedCases.length > 0 && realFailures.length === 0), 'the command cases did not pass');
 if (!forwarded.includes('--list')) {
   const announced = /cli: running (\d+) of (\d+) cases/.exec(result.stdout);
   assert.ok(announced, 'the harness did not announce its count');
-  assert.match(result.stdout, new RegExp(`cli: ${announced[1]} of ${announced[1]} cases passed`), 'not every announced case passed');
-  console.log(`cli-test: ${announced[1]} of ${announced[2]} carried command cases passed`);
+  const passed = Number(announced[1]) - notRun.length;
+  if (notRun.length === 0) assert.match(result.stdout, new RegExp(`cli: ${announced[1]} of ${announced[1]} cases passed`), 'not every announced case passed');
+  else assert.match(result.stdout, new RegExp(`cli: ${notRun.length} of ${announced[1]} cases failed`), 'the harness failed other cases than the ones not run here');
+  console.log(`cli-test: ${passed} of ${announced[2]} carried command cases passed`);
+  for (const name of notRun) console.log(`NOT-RUN: ${name}: needs ${linuxOnly[name]}, which ${process.platform} does not provide`);
 }

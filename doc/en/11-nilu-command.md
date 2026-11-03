@@ -38,6 +38,8 @@ Available options are:
 | `nilu -W hello.nilu` | runs with warnings on, as after `warn("@on")` |
 | `nilu -v` | prints the version |
 
+On Windows, the lines the command writes to standard output end in `\r\n`, as Lua's command's do; elsewhere they end in `\n`.
+
 ```sh nilu-cli
 nilu -e 'print(1 + 2)'
 ```
