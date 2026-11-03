@@ -59,11 +59,13 @@ test "stdlib_warn without a writer a warning does nothing" {
 test "stdlib_warn %p writes an object's address and (null) for any other value" {
     const state = try opened(false);
     defer api.nilu_close(state);
-    try std.testing.expectEqualStrings("true true (null) [(null)      ] 16", try answer(state,
+    // An address is as long as the platform makes it; past the width, a
+    // field is the address itself.
+    try std.testing.expectEqualStrings("true true (null) [(null)      ] true", try answer(state,
         \\local t = {}
         \\local same = string.format("%p", t) == tostring(t):match("0x%x+")
         \\return table.concat({tostring(same), tostring(string.format("%p", "s"):match("^0x%x+$") ~= nil),
-        \\  string.format("%p", nil), string.format("[%-12p]", 1), tostring(#string.format("[%10p]", {}))}, " ")
+        \\  string.format("%p", nil), string.format("[%-12p]", 1), tostring(#string.format("[%10p]", t) == 2 + math.max(10, #string.format("%p", t)))}, " ")
     ));
     try std.testing.expectEqualStrings("t:1: invalid conversion specification: '%.3p'", try answer(state, "return string.format('%.3p', {})"));
 }
