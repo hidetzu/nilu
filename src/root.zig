@@ -88,6 +88,7 @@ test {
     _ = @import("c_api_state_test.zig");
     _ = @import("hash_part_test.zig");
     _ = @import("interruption_test.zig");
+    _ = @import("fuzz_test.zig");
     _ = @import("math_functions_test.zig");
     _ = @import("string_format_test.zig");
     _ = @import("c_api_contract_test.zig");

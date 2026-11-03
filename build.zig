@@ -49,33 +49,7 @@ pub fn build(builder: *std.Build) void {
         .target = builder.graph.host,
         .optimize = optimize,
     });
-    source_module.addAnonymousImport("lua55-numerals", .{ .root_source_file = builder.path("test/fixtures/lua55-numerals.txt") });
-    source_module.addAnonymousImport("lua55-numeral-parsing", .{ .root_source_file = builder.path("test/fixtures/lua55-numeral-parsing.txt") });
-    source_module.addAnonymousImport("lua55-format", .{ .root_source_file = builder.path("test/fixtures/lua55-format.txt") });
-    source_module.addAnonymousImport("lua55-expressions", .{ .root_source_file = builder.path("test/fixtures/lua55-expressions.txt") });
-    source_module.addAnonymousImport("lua55-statements", .{ .root_source_file = builder.path("test/fixtures/lua55-statements.txt") });
-    source_module.addAnonymousImport("lua55-varargs", .{ .root_source_file = builder.path("test/fixtures/lua55-varargs.txt") });
-    source_module.addAnonymousImport("lua55-calls", .{ .root_source_file = builder.path("test/fixtures/lua55-calls.txt") });
-    source_module.addAnonymousImport("lua55-functions", .{ .root_source_file = builder.path("test/fixtures/lua55-functions.txt") });
-    source_module.addAnonymousImport("lua55-generic-for", .{ .root_source_file = builder.path("test/fixtures/lua55-generic-for.txt") });
-    source_module.addAnonymousImport("lua55-index-chains", .{ .root_source_file = builder.path("test/fixtures/lua55-index-chains.txt") });
-    source_module.addAnonymousImport("lua55-newindex-chains", .{ .root_source_file = builder.path("test/fixtures/lua55-newindex-chains.txt") });
-    source_module.addAnonymousImport("lua55-index-handlers", .{ .root_source_file = builder.path("test/fixtures/lua55-index-handlers.txt") });
-    source_module.addAnonymousImport("lua55-operator-handlers", .{ .root_source_file = builder.path("test/fixtures/lua55-operator-handlers.txt") });
-    source_module.addAnonymousImport("lua55-order-handlers", .{ .root_source_file = builder.path("test/fixtures/lua55-order-handlers.txt") });
-    source_module.addAnonymousImport("lua55-call-chains", .{ .root_source_file = builder.path("test/fixtures/lua55-call-chains.txt") });
-    source_module.addAnonymousImport("lua55-reserved-word-keys", .{ .root_source_file = builder.path("test/fixtures/lua55-reserved-word-keys.txt") });
-    source_module.addAnonymousImport("c-api-header", .{ .root_source_file = builder.path("include/nilu.h") });
-    source_module.addAnonymousImport("manual-library", .{ .root_source_file = builder.path("doc/en/10-library.md") });
-    source_module.addAnonymousImport("manual-failure", .{ .root_source_file = builder.path("doc/en/08-failure.md") });
-    source_module.addAnonymousImport("manual-01", .{ .root_source_file = builder.path("doc/en/01-getting-started.md") });
-    source_module.addAnonymousImport("manual-02", .{ .root_source_file = builder.path("doc/en/02-values.md") });
-    source_module.addAnonymousImport("manual-03", .{ .root_source_file = builder.path("doc/en/03-variables.md") });
-    source_module.addAnonymousImport("manual-04", .{ .root_source_file = builder.path("doc/en/04-statements.md") });
-    source_module.addAnonymousImport("manual-05", .{ .root_source_file = builder.path("doc/en/05-expressions.md") });
-    source_module.addAnonymousImport("manual-06", .{ .root_source_file = builder.path("doc/en/06-functions.md") });
-    source_module.addAnonymousImport("manual-07", .{ .root_source_file = builder.path("doc/en/07-metatables.md") });
-    source_module.addAnonymousImport("manual-09", .{ .root_source_file = builder.path("doc/en/09-gc.md") });
+    addFixtures(builder, source_module);
     source_module.addIncludePath(builder.path("include"));
     // The header as a C compiler reads it; c_api_abi_test compares the
     // exported functions with these declarations.
@@ -97,6 +71,15 @@ pub fn build(builder: *std.Build) void {
     run_tests.has_side_effects = true;
     stage.dependOn(&run_tests.step);
     builder.step("test", "Run native Zig tests; missing source, zero tests and skips fail").dependOn(&run_tests.step);
+    // The fuzz targets run as a plain test run, which the build runner's
+    // `--fuzz` drives itself; `test` above runs their corpora only.
+    // Their own module: the unit tests' C callbacks would be instrumented
+    // too, and a C object finds no coverage runtime to link against.
+    const fuzz_module = builder.createModule(.{ .root_source_file = builder.path("src/fuzz_test.zig"), .target = builder.graph.host, .optimize = optimize, .link_libc = true });
+    fuzz_module.addImport("layout", layoutModule(builder, Layout.default));
+    addFixtures(builder, fuzz_module);
+    const fuzz_tests = builder.addTest(.{ .root_module = fuzz_module, .use_llvm = true, .filters = &.{"fuzz "} });
+    builder.step("fuzz", "Run the fuzz targets' corpora; add --fuzz=<limit> to search").dependOn(&builder.addRunArtifact(fuzz_tests).step);
 
     // An explicitly partial C boundary; full c-test/install remain pending.
     const c_library = builder.addLibrary(.{
@@ -376,6 +359,43 @@ fn headerVersion(builder: *std.Build) ?[]const u8 {
     const end = std.mem.indexOfScalarPos(u8, text, start, '"') orelse return null;
     if (end == start) return null;
     return text[start..end];
+}
+
+/// The carried fixtures and manual chapters that tests embed by name. Every
+/// module that compiles the core's own tests needs them, since a core file's
+/// inline tests compile wherever the file is.
+const fixtures = [_][2][]const u8{
+    .{ "lua55-numerals", "test/fixtures/lua55-numerals.txt" },
+    .{ "lua55-numeral-parsing", "test/fixtures/lua55-numeral-parsing.txt" },
+    .{ "lua55-format", "test/fixtures/lua55-format.txt" },
+    .{ "lua55-expressions", "test/fixtures/lua55-expressions.txt" },
+    .{ "lua55-statements", "test/fixtures/lua55-statements.txt" },
+    .{ "lua55-varargs", "test/fixtures/lua55-varargs.txt" },
+    .{ "lua55-calls", "test/fixtures/lua55-calls.txt" },
+    .{ "lua55-functions", "test/fixtures/lua55-functions.txt" },
+    .{ "lua55-generic-for", "test/fixtures/lua55-generic-for.txt" },
+    .{ "lua55-index-chains", "test/fixtures/lua55-index-chains.txt" },
+    .{ "lua55-newindex-chains", "test/fixtures/lua55-newindex-chains.txt" },
+    .{ "lua55-index-handlers", "test/fixtures/lua55-index-handlers.txt" },
+    .{ "lua55-operator-handlers", "test/fixtures/lua55-operator-handlers.txt" },
+    .{ "lua55-order-handlers", "test/fixtures/lua55-order-handlers.txt" },
+    .{ "lua55-call-chains", "test/fixtures/lua55-call-chains.txt" },
+    .{ "lua55-reserved-word-keys", "test/fixtures/lua55-reserved-word-keys.txt" },
+    .{ "c-api-header", "include/nilu.h" },
+    .{ "manual-library", "doc/en/10-library.md" },
+    .{ "manual-failure", "doc/en/08-failure.md" },
+    .{ "manual-01", "doc/en/01-getting-started.md" },
+    .{ "manual-02", "doc/en/02-values.md" },
+    .{ "manual-03", "doc/en/03-variables.md" },
+    .{ "manual-04", "doc/en/04-statements.md" },
+    .{ "manual-05", "doc/en/05-expressions.md" },
+    .{ "manual-06", "doc/en/06-functions.md" },
+    .{ "manual-07", "doc/en/07-metatables.md" },
+    .{ "manual-09", "doc/en/09-gc.md" },
+};
+
+fn addFixtures(builder: *std.Build, module: *std.Build.Module) void {
+    for (fixtures) |fixture| module.addAnonymousImport(fixture[0], .{ .root_source_file = builder.path(fixture[1]) });
 }
 
 fn nodeStep(builder: *std.Build, name: []const u8, description: []const u8, script: []const u8) *std.Build.Step.Run {
