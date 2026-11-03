@@ -22,3 +22,25 @@ jobs:
       # every example of both manuals, the embedding example and the complete
       # document check. `dist` is not part of it; a release is built on purpose.
       - run: zig build check --summary all
+
+  # The other release targets, each on a runner of its own (hidetzu/nilu#8):
+  # a cross build is not evidence that a target runs. `check` above stays the
+  # required status. On macOS three carried command cases need what only
+  # Linux provides and are announced as NOT-RUN. On Windows only the source
+  # tests run: its C hosts and command cases are not verified yet.
+  targets:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { target: aarch64-linux-gnu, runner: ubuntu-24.04-arm, step: check }
+          - { target: x86_64-macos, runner: macos-15-intel, step: check }
+          - { target: aarch64-macos, runner: macos-latest, step: check }
+          - { target: x86_64-windows-gnu, runner: windows-latest, step: test }
+    runs-on: ${{ matrix.runner }}
+    name: ${{ matrix.target }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v5
+      - run: zig version && node --version
+      - run: zig build ${{ matrix.step }} --summary all

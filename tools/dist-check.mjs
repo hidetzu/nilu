@@ -44,7 +44,9 @@ for (const target of targets) {
     const result = spawnSync(join(dist, directory, binary), ['-v'], { encoding: 'utf8', timeout: 30000 });
     if (result.error) throw result.error;
     assert.equal(result.status, 0, result.stderr);
-    assert.equal(result.stdout, `nilu ${version}\n`, `${directory}/${binary} -v did not print its version`);
+    // The command writes text lines, which end in CRLF on Windows, as Lua's
+    // command's do (the owner's answer on hidetzu/nilu#8).
+    assert.equal(result.stdout, `nilu ${version}${windows ? '\r\n' : '\n'}`, `${directory}/${binary} -v did not print its version`);
     ran = target;
   }
 }
