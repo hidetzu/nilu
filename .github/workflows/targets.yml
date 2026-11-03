@@ -65,14 +65,26 @@ jobs:
         if: runner.os != 'Windows'
         run: zig build test -Dtest-filter=failure_handling --summary all
         continue-on-error: true
+      - name: the command run by hand
+        shell: bash
+        continue-on-error: true
+        run: |
+          zig build --summary none
+          ls zig-out/bin
+          for exe in zig-out/bin/nilu zig-out/bin/nilu.exe; do [ -e "$exe" ] || continue
+            "$exe" -v | od -c | head -3; echo "exit ${PIPESTATUS[0]}"
+            "$exe" -e 'print(1 + 1)' | od -c | head -3; echo "exit ${PIPESTATUS[0]}"
+          done
       - name: c-test
-        run: zig build c-test --summary all
+        run: zig build c-test --summary all 2>&1 | grep -v "^  ok " | tail -60
+        shell: bash
         continue-on-error: true
       - name: cli-test
         run: zig build cli-test --summary all
         continue-on-error: true
       - name: example
-        run: zig build example --summary all
+        run: zig build example --summary all 2>&1 | tail -60
+        shell: bash
         continue-on-error: true
       - name: manual-check
         run: zig build manual-check --summary all
