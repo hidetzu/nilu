@@ -26,7 +26,7 @@ The authoritative version is `NILU_VERSION` in [`include/nilu.h`](../../include/
 7. [Metatables](07-metatables.md) — `__index`, `__newindex`, operator metamethods
 8. [Failure](08-failure.md) — what is a failure and what is not
 9. [Garbage collection](09-gc.md) — what is freed, and when
-10. [The library](10-library.md) — the basic functions and `string`, `table`, `math`, `utf8`
+10. [The library](10-library.md) — the basic functions and `string`, `table`, `math`, `utf8`, `coroutine`, `debug`
 11. [The `nilu` command](11-nilu-command.md) — files, `-e`, standard input, the prompt, `io` and `os`
 12. [Embedding from C](12-embedding.md) — the stack, calls, the host's functions
 13. [Differences from Lua](13-differences-from-lua.md) — what was borrowed, what was changed, what is absent

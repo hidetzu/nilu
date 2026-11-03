@@ -36,15 +36,13 @@ Use a state from only one thread at a time. Different states may run on
 different threads concurrently; simultaneous use of the same state is undefined.
 The host must coordinate access, including access from callbacks. Synchronous
 reentry from a native function or hook follows the existing call and hook rules;
-it does not allow concurrent access from another thread. The public C constructor
-chooses its allocator; it does not accept a host allocator. When using the internal
-Zig constructor with a supplied allocator, that allocator must support concurrent
-use if shared between threads. Host resources shared by callbacks need their own
+it does not allow concurrent access from another thread. `nilu_new` chooses its
+own allocator; an allocator a host gives `nilu_newstate` must be safe for every
+state that uses it, states on different threads included. Host resources shared by callbacks need their own
 synchronization.
 
-Until 0.1.0 is released, compatibility of the API, ABI, language and command
-is not guaranteed between development versions
-([11.1](11-nilu-command.md#111-how-to-run-it)).
+What a version promises about compatibility is in
+[11.1](11-nilu-command.md#111-how-to-run-it).
 
 ## 12.1. The shortest host
 

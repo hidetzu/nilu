@@ -9,7 +9,7 @@ Nilu is a small scripting language for embedding. This is what it can do.
 - A comment runs from `--` to the end of the line, or is `--[[ … ]]` ([15.2](15-grammar.md#152-lexical-conventions))
 - A function is a value and can see the variables around it (a closure)
 - A table can be given a metatable, which answers for indexing and for operators
-- The standard library is the tables `string`, `table`, `math` and `utf8`, and a few basic functions (the `nilu` command also has `io` and `os`)
+- The standard library is the tables `string`, `table`, `math`, `utf8`, `coroutine` and `debug`, and a few basic functions (the `nilu` command also has `io` and `os`)
 - A host program calls it through the C API
 
 It is built with Lua 5.5 as its primary source, so if you know Lua, most of this reads as is.
@@ -17,8 +17,8 @@ The differences are collected in [13. Differences from Lua](13-differences-from-
 
 ## 1.1. Getting it
 
-All you need is [Zig](https://ziglang.org). Use the version written in
-[`.mise.toml`](../../.mise.toml).
+How to build it, and with which Zig, is in the repository's
+[README](../../README.md#build-from-source). From a checkout:
 
 ```bash
 zig build
@@ -30,7 +30,7 @@ This produces three things.
 |---|---|
 | `zig-out/bin/nilu` | the command |
 | `zig-out/include/nilu.h` | the header a C host reads |
-| `zig-out/lib/libnilu.a` | the library a C host links |
+| `zig-out/lib/libnilu.a` (`nilu.lib` on Windows) | the library a C host links |
 
 Only the last two are needed to embed it from C
 ([12. Embedding from C](12-embedding.md)).

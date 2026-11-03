@@ -18,25 +18,48 @@ cases, and `zig build dist` builds the release artifacts; no release is publishe
 
 ## A taste of Nilu
 
-A script can calculate settings and return them to its host:
+A script can calculate settings for its host:
 
-```lua
+```lua nilu
 local function pixels(units)
   return units * 16
 end
 
-return {
+local settings = {
   title = "My app",
   width = pixels(50),
   height = pixels(30)
 }
+print(settings.title, settings.width, settings.height)
+```
+```output
+My app	800	480
 ```
 
-This returns a table with the title `My app`, width `800` and height `480`.
+`zig build manual-check` runs this example, as it runs every example of the manual.
 
 Nilu follows many of Lua's conventions, with some deliberate differences. For
 example, `"1" + 1` is a type error: a string never becomes a number by itself. See
 [Differences from Lua](doc/en/13-differences-from-lua.md) for the full comparison.
+
+## What it suits, and what it does not
+
+It suits a host that keeps control: configuration, rules and behaviour that a C
+program loads once and calls many times, under its own allocator and an
+instruction budget. A state that loads once and calls repeatedly holds steady
+memory, and every refusal of the host's allocator comes back as a status.
+
+It does not suit:
+
+- **Running code you do not trust as if it were contained.** Nilu is not a sandbox. A
+  single library call, pattern matching above all, runs without the hook, and its time
+  has no bound ([12.5](doc/en/12-embedding.md#125-stopping-a-program-that-does-not-stop)).
+- **One state shared by threads.** A state is used from one thread at a time.
+- **A long-lived state that loads source again and again.** Every loaded function stays
+  until the state closes; reloading the same text keeps another copy
+  ([9.3](doc/en/09-gc.md#93-when-it-happens)).
+- **Programs that make few, large objects in a tight memory limit.** A collection is started
+  by the number of objects, not their size.
 
 ## Build from source
 
@@ -89,16 +112,9 @@ and includes `zig-out/include/nilu.h`. [`examples/`](examples/) holds small whol
 the shortest one, functions in both directions, a coroutine the host drives, and a host that runs rules a script defines under its own allocator and an instruction budget — and
 `zig build example` builds each against the installed files and compares what it prints.
 
-Loaded function bodies stay allocated until their state closes. Hosts that reload
-scripts repeatedly should account for this lifetime; loading once and calling
-the resulting function repeatedly avoids repeated compilation. See the
-[collection and lifetime limits](doc/en/09-gc.md#93-when-it-happens) before
-choosing a state lifetime.
-
-Until 0.1.0 is released, compatibility of the API, ABI, language and command
-is not guaranteed between development versions
-([11.1](doc/en/11-nilu-command.md#111-how-to-run-it)). The
-[embedding guide's opening](doc/en/12-embedding.md) gives the thread rule.
+The [embedding guide's opening](doc/en/12-embedding.md) gives how long a state
+should live, and the thread rule. What a version promises about compatibility is
+in [11.1](doc/en/11-nilu-command.md#111-how-to-run-it).
 
 ## Documentation
 
