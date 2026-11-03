@@ -68,6 +68,27 @@ When a check fails inside the test wrapper and its output is cut, run the test
 binary the failure names (`failed command: … --name test`, under `.zig-cache/o/`)
 directly to see all of it.
 
+## Fuzzing
+
+`src/fuzz_test.zig` holds the fuzz targets: source bytes and token sequences loaded and
+run, the parser over raw bytes with refused allocations, numerals, and C API call
+sequences. `zig build test` runs each over its corpus and an empty input only. The
+build runner's fuzzer searches with them:
+
+```sh
+zig build fuzz -Doptimize=ReleaseSafe --fuzz=200K   # each target 200K times, then a report
+zig build fuzz --fuzz                                # without a limit, with the web interface
+```
+
+A target fails on a crash, a safety check, a leak, or a state that does not answer
+`return 1 + 1` afterwards; the input that failed is saved under `.zig-cache/f/`. A
+finding becomes a regression test of its own. The targets leave out pattern matching,
+whose time has no bound and which the hook does not see (manual 12.5), and run every
+input under a memory limit and an instruction budget. The input also picks how the hook
+watches a program's run: a plain budget; a collection asked for every 50 instructions, so
+a value the collector does not reach is freed while still in use; or a script of the
+hook's own run on the same state, re-entering it.
+
 ## Reference answers from Lua
 
 The files `test/fixtures/lua55-*.txt` hold answers captured from `lua5.5` 5.5.1;
