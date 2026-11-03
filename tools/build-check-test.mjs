@@ -80,7 +80,7 @@ const cases = [
     run: () => fixture(({ build }) => {
       const result = build('--help');
       assert.equal(result.status, 0, result.output);
-      for (const name of ['stage-check', 'tool-test', 'docs-check', 'fmt-check', 'test', 'naming-check', 'naming-check-test', 'c-test', 'cli-test', 'manual-check', 'manual-check-test', 'example', 'check', 'dist']) {
+      for (const name of ['stage-check', 'tool-test', 'docs-check', 'fmt-check', 'test', 'naming-check', 'naming-check-test', 'c-test', 'cli-test', 'manual-check', 'manual-check-test', 'example', 'check', 'dist', 'fuzz']) {
         assert.match(result.output, new RegExp(`\\b${name}\\b`));
       }
       return 'Zig lists current and pending entry points';
@@ -133,6 +133,26 @@ const cases = [
       failed(build('test'), /TestUnexpectedResult/);
       return 'a real Zig assertion fails the build';
     }),
+  },
+  {
+    name: 'a-long-failing-report-arrives-whole',
+    run: () => {
+      // A reader slower than the wrapper, as a CI log is: the wrapper once
+      // exited with its report still queued for the pipe, and the failure at
+      // the end of the report was the part that never arrived.
+      const directory = mkdtempSync(join(tmpdir(), 'nilu-long-report-'));
+      try {
+        const fake = join(directory, 'fake-test');
+        writeFileSync(fake, '#!/bin/sh\ni=0\nwhile [ $i -lt 4000 ]; do echo "line $i of a long report" >&2; i=$((i+1)); done\necho "1 passed; 0 skipped; 1 failed." >&2\nexit 1\n', { mode: 0o755 });
+        const command = `"${process.execPath}" "${join(root, 'tools/run-zig-tests.mjs')}" "${fake}" 2>&1 | (sleep 1; cat)`;
+        const result = spawnSync('/bin/sh', ['-c', command], { encoding: 'utf8', maxBuffer: 4 * 1024 * 1024 });
+        if (result.error) throw result.error;
+        assert.match(result.stdout, /line 3999 of a long report\n1 passed; 0 skipped; 1 failed\./);
+        return 'a failing run longer than a pipe holds reaches a slow reader to its end';
+      } finally {
+        rmSync(directory, { recursive: true, force: true });
+      }
+    },
   },
   {
     name: 'allocation-leaks-propagate',

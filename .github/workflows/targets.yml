@@ -57,7 +57,7 @@ jobs:
           set +e
           "$bin" > direct.out 2> direct.err
           echo "exit status $?"
-          tail -c 3000 direct.err
+          grep -n -B2 -A25 -E "FAIL|failed with" direct.err | head -120
           echo "--- stdout tail"
           tail -c 1000 direct.out
           echo "--- stderr bytes $(wc -c < direct.err)"
