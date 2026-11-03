@@ -1,0 +1,17 @@
+local function tree(depth)
+  if depth == 0 then return {} end
+  return {tree(depth - 1), tree(depth - 1)}
+end
+local function check(node)
+  if node[1] == nil then return 1 end
+  return 1 + check(node[1]) + check(node[2])
+end
+local kept, total = {}, 0
+for round = 1, 60 do
+  local t = tree(12)
+  total = total + check(t)
+  if round % 10 == 0 then kept[#kept + 1] = t end
+end
+local held = 0
+for i = 1, #kept do held = held + check(kept[i]) end
+print(total, held)
